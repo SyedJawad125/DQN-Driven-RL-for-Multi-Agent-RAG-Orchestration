@@ -1,18 +1,87 @@
 
+# services:
+#   web:
+#     build: .
+# #    command: python manage.py runserver 0.0.0.0:8000
+#     command: gunicorn --bind 0.0.0.0:8000 config.wsgi:application
+#     entrypoint: ["/entrypoint.sh"]
+#     volumes:
+#       - .:/app
+#     ports:
+#       - "8000:8000"
+#     env_file:
+#       - .env
+#     depends_on:
+#       - db
+
+#   db:
+#     image: postgres:15
+#     environment:
+#       POSTGRES_DB: ${POSTGRES_DB}
+#       POSTGRES_USER: ${POSTGRES_USER}
+#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+#     ports:
+#       - "5432:5432"
+
+#   rabbitmq:
+#     image: rabbitmq:3-management
+#     ports:
+#       - "5672:5672"   # broker port
+#       - "15672:15672" # management UI
+#     environment:
+#       RABBITMQ_DEFAULT_USER: guest
+#       RABBITMQ_DEFAULT_PASS: guest
+
+#   worker:
+#     build: .
+#     command: celery -A config worker -l info
+# #    command: gunicorn --bind 0.0.0.0:8000 config.wsgi:application --workers=1 --threads=2 --timeout=120
+#     entrypoint: ["/entrypoint.sh"]
+#     volumes:
+#       - .:/app
+#     env_file:
+#       - .env
+#     depends_on:
+#       - rabbitmq
+
+#   adminer:
+#     image: adminer
+#     container_name: adminer_template
+#     restart: always
+#     ports:
+#       - "8080:8080"
+
+# volumes:
+#   postgres_data:
+# #  pgadmin_data:
+
+
+
+
+
+
+version: '3.9'
+
 services:
   web:
     build: .
-#    command: python manage.py runserver 0.0.0.0:8000
-    command: gunicorn --bind 0.0.0.0:8000 config.wsgi:application
+    command: gunicorn --bind 0.0.0.0:8000 config.wsgi:application --workers=2 --timeout=120
     entrypoint: ["/entrypoint.sh"]
     volumes:
       - .:/app
+      - chroma_data:/app/chroma_db
+      - rl_data:/app/rl_models
     ports:
       - "8000:8000"
     env_file:
       - .env
     depends_on:
       - db
+      - redis
+    environment:
+      - LANGCHAIN_TRACING_V2=true
 
   db:
     image: postgres:15
@@ -24,36 +93,69 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
 
   rabbitmq:
     image: rabbitmq:3-management
     ports:
-      - "5672:5672"   # broker port
-      - "15672:15672" # management UI
+      - "5672:5672"
+      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
 
   worker:
     build: .
-    command: celery -A config worker -l info
-#    command: gunicorn --bind 0.0.0.0:8000 config.wsgi:application --workers=1 --threads=2 --timeout=120
+    command: celery -A config worker -l info -Q default,rl_training,n8n_events
     entrypoint: ["/entrypoint.sh"]
     volumes:
       - .:/app
+      - chroma_data:/app/chroma_db
+      - rl_data:/app/rl_models
     env_file:
       - .env
     depends_on:
       - rabbitmq
+      - redis
+      - db
+
+  # === n8n Workflow Automation ===
+  n8n:
+    image: n8nio/n8n:latest
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=adminpass
+      - WEBHOOK_URL=http://n8n:5678
+      - N8N_HOST=0.0.0.0
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      - redis
 
   adminer:
     image: adminer
-    container_name: adminer_template
     restart: always
     ports:
       - "8080:8080"
 
 volumes:
   postgres_data:
-#  pgadmin_data:
-
+  redis_data:
+  chroma_data:
+  rl_data:
+  n8n_data:
