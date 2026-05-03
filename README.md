@@ -49,3 +49,7 @@ LangGraph gives you a visual, debuggable state machine instead of manual if/else
 Built-in streaming, checkpointing, and human-in-the-loop support
 CrewAI agents are drop-in for role-based tasks (researcher, writer, critic)
 n8n automates your entire ops loop (alerts, retraining triggers, Slack reports)
+
+Structure Image:
+
+![alt text](image.png)
