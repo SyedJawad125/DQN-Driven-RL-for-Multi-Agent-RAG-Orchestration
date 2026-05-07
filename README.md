@@ -1,19 +1,28 @@
-Project Description:
+🚀 Project Title
 
-A fully featured authentication system that includes user registration, login, password update, forgot password, OTP verification, and secure logout. The backend is built with Django, the frontend uses Next.js 14, and PostgreSQL is used as the database. The system follows a robust and secure authentication flow utilizing both access and refresh tokens.
+DQN-RAG LangGraph Multi-Agent AI Platform with Secure Auth System
 
-Here is the short summary of project:
+📌 Overview
 
-Deep Q-Network (DQN) / neural Q.
-This project keeps the entire foundation and upgrades the three weak points. The RL brain is now a small neural network (DQN) that sees a richer 6-number description of each situation and has a separate "target network" to keep training stable. On first boot it pre-trains on 800 synthetic examples so it already knows the basics before seeing real users. The reward signal is now real — a new EvaluatorAgent scores every answer on factuality, coverage, hallucination risk, and conciseness using one LLM call, and that composite score drives the RL update instead of the old heuristic. And parallel execution actually works now: when the planner says "use both RAG and web search," they genuinely run at the same time via asyncio.gather()
+This project is a production-ready AI platform + authentication system that combines:
 
-About This Project:
+🔐 Secure user authentication (Django + JWT)
+🤖 Intelligent multi-agent orchestration (LangGraph)
+🧠 Reinforcement Learning (DQN-based decision engine)
+⚡ Parallel retrieval (RAG + Web Search)
+🔄 Workflow automation (n8n)
 
-This project focuses on building AI-powered chatbots capable of making intelligent decisions—determining when to retrieve additional information and when to generate responses. This approach helps reduce API costs while significantly improving response accuracy.
+It enables AI chatbots that dynamically decide whether to:
 
-Say:
+retrieve more information
+search the web
+or directly answer
 
-I build AI chatbots that intelligently decide when to search more data and when to answer, reducing API costs and improving accuracy.
+➡️ Result: lower API cost + higher accuracy
+
+🧠 Core Idea (Simple Explanation)
+
+I build AI chatbots that intelligently decide when to search for more data and when to answer, reducing API costs and improving accuracy.
 
 ---------------------------------------------
 
@@ -43,13 +52,88 @@ LangGraph Orchestrator
     n8n → Slack / Email / Webhook notifications
 
 
-Why this beats your current system:
+⚙️ Key Features
+🔐 Authentication System
+User Registration & Login
+JWT-based Authentication (Access + Refresh Tokens)
+Password Reset (OTP आधारित verification)
+Secure Logout
+Built with Django + PostgreSQL + Next.js 14
 
-LangGraph gives you a visual, debuggable state machine instead of manual if/else routing
-Built-in streaming, checkpointing, and human-in-the-loop support
-CrewAI agents are drop-in for role-based tasks (researcher, writer, critic)
-n8n automates your entire ops loop (alerts, retraining triggers, Slack reports)
+🤖 Multi-Agent AI System
+Agents:
+PlannerAgent → decides workflow
+RAGAgent → retrieves from vector DB
+SearchAgent → fetches real-time web data
+EvaluatorAgent → scores output quality
+AnswerAgent → generates final response
+RLAgent (DQN) → learns best decisions
+
+🧠 Reinforcement Learning Upgrade (DQN)
+Improvements over basic RL:
+Neural Q-Network instead of table-based Q-learning
+6-dimensional state representation
+Target network for stability
+Pretrained on ~800 synthetic samples
+Real reward from LLM evaluation
+
+RL decides:
+Retrieve more data?
+Use web search?
+Answer now?
+Re-rank results?
+📊 Evaluation System
+
+EvaluatorAgent scores responses based on:
+
+Factuality
+Coverage
+Hallucination Risk
+Conciseness
+
+➡️ This score becomes the reward signal for RL training
+
+📂 Project Structure (Aligned with Your Image)
+🔹 agents/
+
+Core AI logic
+
+planner_agent.py
+rag_agent.py
+search_agent.py
+evaluator_agent.py
+answer_agent.py
+rl_agent.py
+rl_memory.py
+
+🔹 graph/ (LangGraph Layer - NEW)
+state.py → shared state across nodes
+nodes.py → all node logic (planner, retriever, etc.)
+graph_builder.py → builds LangGraph workflow
+executor.py → replaces old coordinator
+
+🔹 crew/ (Optional AI roles)
+rag_crew.py → Researcher → Analyst → Writer flow
+
+🔹 services/
+document_processor.py
+core_services.py
+
+🔹 Django Layer
+models.py
+serializers.py
+views.py (UPDATED → now uses executor)
+tasks.py (Celery async tasks)
+
+🧾 Short Resume Version (Use This)
+
+AI Engineer | Multi-Agent Systems | RL + RAG
+
+Built a DQN-powered multi-agent AI platform using LangGraph that dynamically decides when to retrieve data, perform web search, or generate responses—reducing API costs and improving answer accuracy. Integrated Django-based authentication, Celery workflows, and n8n automation for a production-ready system.
 
 Structure Image:
 
 ![alt text](image.png)
+
+
+------------------------------------------------------

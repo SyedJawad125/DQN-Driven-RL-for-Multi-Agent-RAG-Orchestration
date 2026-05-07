@@ -22,6 +22,16 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 warnings.filterwarnings('ignore', module='tf_keras')
 warnings.filterwarnings('ignore', category=UserWarning, module='torchvision')
 
+# In settings.py, add:
+
+LANGCHAIN_TRACING_V2 = os.getenv("LANGCHAIN_TRACING_V2", "false").lower() == "true"
+LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY", "")
+LANGCHAIN_PROJECT = os.getenv("LANGCHAIN_PROJECT", "rag-multiagent")
+
+if LANGCHAIN_TRACING_V2:
+    os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    os.environ["LANGCHAIN_API_KEY"] = LANGCHAIN_API_KEY
+    os.environ["LANGCHAIN_PROJECT"] = LANGCHAIN_PROJECT
 
 
 load_dotenv()
