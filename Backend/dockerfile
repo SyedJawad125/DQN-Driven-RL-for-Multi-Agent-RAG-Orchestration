@@ -1,5 +1,5 @@
 # 1) Base image
-FROM python:3.12.7-slim AS runtime
+FROM python:3.11.9-slim AS runtime
 
 # 2) Environment
 ENV PYTHONDONTWRITEBYTECODE=1 \
